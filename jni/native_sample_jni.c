@@ -16,6 +16,16 @@ jstring nativeConversation(JNIEnv* env, jobject clazz, jstring fromJava){
   return (*env)->NewStringUTF(env, "nice to see you , i am c");
 }
 
+void nativePrintTime(JNIEnv* env, jobject clazz){
+	jclass clazzDate = (*env)->FindClass(env,"java/util/Date");
+	jmethodID outputDateID = (*env)->GetMethodID(env,clazzDate,"<init>","()V");
+	jobject dateObj =(*env)->NewObject(env,clazzDate,outputDateID);
+	jmethodID dateGetTime = (*env)->GetMethodID(env,clazzDate, "getTime","()J");
+	unsigned times = (*env)->CallLongMethod(env,dateObj, dateGetTime);
+  __android_log_print(ANDROID_LOG_INFO,"TAG","get time : %u", times);
+
+}
+
 /************** for register api  **************/
 static const char* const KClassPath = "com/lingavin/jnisample/JavaToJni";
 
@@ -23,6 +33,7 @@ static const char* const KClassPath = "com/lingavin/jnisample/JavaToJni";
 static JNINativeMethod gMethods[] = {
 	{"intToJni","(I)V", (void*)nativeIntToJni},
 	{"conversation","(Ljava/lang/String;)Ljava/lang/String;", (void*)nativeConversation},
+	{"printTime","()V", (void*)nativePrintTime},
 };
 
 static int registerNativeMethods(JNIEnv* env,const char* className,

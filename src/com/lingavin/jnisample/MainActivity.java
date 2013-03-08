@@ -19,6 +19,7 @@ public class MainActivity extends Activity {
 		JavaToJni.intToJni(255);
 		tv_message.setText("message from jni is :" + 
 				JavaToJni.conversation("Hello i am java!"));
+		JavaToJni.printTime();
 	}
 
 	private void initViews() {
