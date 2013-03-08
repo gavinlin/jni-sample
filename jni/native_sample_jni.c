@@ -6,12 +6,23 @@ void nativeIntToJni(JNIEnv* env, jobject clazz, jint num){
 	__android_log_print(ANDROID_LOG_INFO,"TAG","native get num is %d",num);
 }
 
+jstring nativeConversation(JNIEnv* env, jobject clazz, jstring fromJava){
+  const char* message;
+  message = (*env)->GetStringUTFChars(env,fromJava,NULL);
+
+  __android_log_print(ANDROID_LOG_INFO,"TAG","message from java: %s", message);
+
+  (*env)->ReleaseStringUTFChars(env, fromJava, message);
+  return (*env)->NewStringUTF(env, "nice to see you , i am c");
+}
+
 /************** for register api  **************/
 static const char* const KClassPath = "com/lingavin/jnisample/JavaToJni";
 
 // java_method,  (in)return,  native_method
 static JNINativeMethod gMethods[] = {
 	{"intToJni","(I)V", (void*)nativeIntToJni},
+	{"conversation","(Ljava/lang/String;)Ljava/lang/String;", (void*)nativeConversation},
 };
 
 static int registerNativeMethods(JNIEnv* env,const char* className,
