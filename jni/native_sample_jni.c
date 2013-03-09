@@ -26,6 +26,37 @@ void nativePrintTime(JNIEnv* env, jobject clazz){
 
 }
 
+void nativeCallMethod(JNIEnv* env,jobject clazz){
+	jclass cls = (*env)->GetObjectClass(env, clazz);
+	jmethodID mid = (*env)->GetMethodID(env, cls, 
+			"callback", "()V");
+	if(mid == NULL){
+		return;
+	}
+	(*env)->CallVoidMethod(env, clazz, mid);
+}
+
+void nativeExceptionCall(JNIEnv* env, jobject clazz){
+	jthrowable exc;
+	jclass cls = (*env)->GetObjectClass(env, clazz);
+	jmethodID mid = 
+		(*env)->GetMethodID(env, cls, "callbackThrowException", "()V");
+	if(mid == NULL)
+		return;
+	(*env)->CallVoidMethod(env, clazz, mid);
+	exc = (*env)->ExceptionOccurred(env);
+	if(exc){
+		jclass newExcCls;
+		(*env)->ExceptionDescribe(env);
+		(*env)->ExceptionClear(env);
+		newExcCls = (*env)->FindClass(env,
+				"java/lang/IllegalArgumentException");
+		if(newExcCls == NULL)
+			return;
+		(*env)->ThrowNew(env, newExcCls, "thrown from C");
+	}
+}
+
 /************** for register api  **************/
 static const char* const KClassPath = "com/lingavin/jnisample/JavaToJni";
 
@@ -34,6 +65,8 @@ static JNINativeMethod gMethods[] = {
 	{"intToJni","(I)V", (void*)nativeIntToJni},
 	{"conversation","(Ljava/lang/String;)Ljava/lang/String;", (void*)nativeConversation},
 	{"printTime","()V", (void*)nativePrintTime},
+	{"callMethod","()V", (void*)nativeCallMethod},
+	{"exceptionCall","()V", (void*)nativeExceptionCall},
 };
 
 static int registerNativeMethods(JNIEnv* env,const char* className,
